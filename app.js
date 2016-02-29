@@ -5,14 +5,7 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-mongoose.connect('localhost/api_db')
-
-var Schema = mongoose.Schema;
-var Item = mongoose.model('items', new Schema({
-    _id: String,
-    name: String,
-    value: Number
-}));
+mongoose.connect('localhost/api_db');
 
 app.get('/', function(req, res){
     var body = [
@@ -26,32 +19,11 @@ app.get('/', function(req, res){
     res.status(400).end(body);
 });
 
-app.get('/items', function(req, res){
-    Item.find().exec()
-        .then((items)=>res.json(items))
-        .catch((err) => handleError(err, res, 'Failed to load items'));
-});
-app.get('/items/:id', function(req, res){
-    var id = req.params.id;
+var itemService = require('./items/service.js');
 
-    Item.findById(id).exec()
-        .then((item) => res.json(item))
-        .catch((err) => handleError(err, res, 'Failed to load item'));
-});
-app.post('/items', function(req, res){
-    var data = req.body;
-    data.id = data.id || new mongoose.mongo.ObjectID();
-
-    Item.findOneAndUpdate({_id: data.id}, data, {upsert:true})
-        .then(() => res.json({id: data.id}))
-        .catch((err) => handleError(err, res, 'Failed to save item'));
-});
-app.delete('/items/:id', function(req, res){
-    var id = req.params.id;
-
-    Item.remove({_id: id})
-        .then(() => res.json({_id:id}))
-        .catch((err) => handleError(err, res, 'Failed to delete item'));
-});
+app.get('/items', itemService.findAll);
+app.get('/items/:id', itemService.findById);
+app.post('/items', itemService.save);
+app.delete('/items/:id', itemService.remove);
 
 app.listen(8000);
