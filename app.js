@@ -14,6 +14,9 @@ app.get('/', function(req, res){
         '[GET]\t\t/items/:id',
         '[POST]\t\t/items',
         '[DELETE]\t/items/:id',
+        '[GET]\t\t/items/:id/images/{imgId}',
+        '[POST]\t\t/items/:id/images',
+        '[DELETE]\t/items/:id/images/{imgId}',
     ].join('\n');
 
     res.status(400).end(body);
@@ -25,5 +28,9 @@ app.get('/items', itemService.findAll);
 app.get('/items/:id', itemService.findById);
 app.post('/items', itemService.save);
 app.delete('/items/:id', itemService.remove);
+
+app.get('/items/:id/images/:imgId', itemService.findImage);
+app.post('/items/:id/images', itemService.uploadImage);
+app.delete('/items/:id/images/:imgId', itemService.removeImage);
 
 app.listen(8000);
